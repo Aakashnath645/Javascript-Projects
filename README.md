@@ -17,3 +17,9 @@ Each project is stored in its own directory and contains:
 - **Technologies**: HTML, CSS, JavaScript (API Integration)
 - **Live Demo**: [Link to live demo](https://67821f2d8f48972060bf4089--stupendous-toffee-9827f6.netlify.app/)
 - **Source Code**: check weather app folder
+
+  ### 2. **To Do List App**
+- **Description**: Application for managing tasks.
+- **Technologies**: HTML, CSS, JavaScript
+- **Live Demo**: [Link to live demo](https://678383050f3572012a36ef85--graceful-twilight-def082.netlify.app/)
+- **Source Code**: check To Do List App folder
