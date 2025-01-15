@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Bit Study Planner</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        body {
+            background-color: #2c2c2c;
+            color: #ffffff;
+            padding: 20px;
+            background-image: linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
+                            linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
+                            linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
+                            linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #4a4a4a;
+            border: 4px solid #ffffff;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .planner-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .daily-planner, .todo-list {
+            background-color: #4a4a4a;
+            border: 4px solid #ffffff;
+            padding: 20px;
+        }
+
+        .hour-slot {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #2c2c2c;
+            border: 2px solid #ffffff;
+        }
+
+        .task-input {
+            background-color: #2c2c2c;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #2c2c2c;
+            border: 2px solid #ffffff;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #00ff00;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #2c2c2c;
+            border: 2px solid #ffffff;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            appearance: none;
+            border: 2px solid #ffffff;
+            background-color: transparent;
+        }
+
+        .checkbox:checked {
+            background-color: #00ff00;
+        }
+
+        .button {
+            background-color: #00ff00;
+            border: none;
+            color: #2c2c2c;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            transition: transform 0.1s;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .planner-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Daily Planner</h1>
+        </div>
+        
+        <div class="planner-grid">
+            <div class="daily-planner">
+                <h2>Daily Schedule</h2>
+                <div id="hourly-slots"></div>
+            </div>
+            
+            <div class="todo-list">
+                <h2>To-Do List</h2>
+                <input type="text" id="todo-input" class="task-input" placeholder="Add new task...">
+                <button onclick="addTodo()" class="button">Add Task</button>
+                <div id="todo-items"></div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sound effects
+        const addSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodHag2ZCQX7O8/J6SDw9hOD2/WI6OT+T7v71XDg3QKr/+OhQNjVDwIJsUmBwdnqCjZmapK6yuL7Dx8nP09bb4OXp7vP4/f8ADBEUFR0gIygvMzQ8QUNLUFVZXmNpb3F2fICGi4+Ul5ygpqmutLa7v8LEzM7T1tve4+Xq7fD19/v9AQQHCg0QFBcaHyImKi0yNjk+QkZJTlJWWV5hZmpvcnZ6foGFiY2Ql5qeoqapr7K2ur7Bxcn');
+        const completeSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodHag2ZCQXz+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v4BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE');
+
+        // Initialize data from localStorage or set defaults
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+        let dailyTasks = JSON.parse(localStorage.getItem('dailyTasks')) || {};
+
+        // Generate hourly slots
+        function generateHourlySlots() {
+            const container = document.getElementById('hourly-slots');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = i.toString().padStart(2, '0') + ':00';
+                const slot = document.createElement('div');
+                slot.className = 'hour-slot';
+                slot.innerHTML = `
+                    <span>${hour}</span>
+                    <input type="text" class="task-input" 
+                           value="${dailyTasks[hour] || ''}"
+                           onchange="updateDailyTask('${hour}', this.value)">
+                `;
+                container.appendChild(slot);
+            }
+        }
+
+        // Update daily task
+        function updateDailyTask(hour, task) {
+            dailyTasks[hour] = task;
+            localStorage.setItem('dailyTasks', JSON.stringify(dailyTasks));
+            addSound.play();
+        }
+
+        // Add todo item
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            if (input.value.trim()) {
+                todos.push({
+                    text: input.value,
+                    completed: false
+                });
+                input.value = '';
+                updateTodos();
+                addSound.play();
+            }
+        }
+
+        // Update todo list
+        function updateTodos() {
+            const container = document.getElementById('todo-items');
+            container.innerHTML = '';
+            
+            todos.forEach((todo, index) => {
+                const item = document.createElement('div');
+                item.className = 'todo-item';
+                item.innerHTML = `
+                    <input type="checkbox" class="checkbox" 
+                           ${todo.completed ? 'checked' : ''}
+                           onchange="toggleTodo(${index})">
+                    <span>${todo.text}</span>
+                `;
+                container.appendChild(item);
+            });
+
+            localStorage.setItem('todos', JSON.stringify(todos));
+            updateProgress();
+        }
+
+        // Toggle todo completion
+        function toggleTodo(index) {
+            todos[index].completed = !todos[index].completed;
+            updateTodos();
+            completeSound.play();
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const completed = todos.filter(todo => todo.completed).length;
+            const total = todos.length;
+            const percentage = total === 0 ? 0 : (completed / total) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+
+        // Initial setup
+        generateHourlySlots();
+        updateTodos();
+    </script>
+</body>
+</html>
+
