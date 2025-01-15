@@ -23,3 +23,9 @@ Each project is stored in its own directory and contains:
 - **Technologies**: HTML, CSS, JavaScript
 - **Live Demo**: [Link to live demo](https://678383050f3572012a36ef85--graceful-twilight-def082.netlify.app/)
 - **Source Code**: check To Do List App folder
+
+### 3. **8bit Daily Planner**
+- **Description**: This is a retro-themed study planner web app, built with HTML, CSS, and JavaScript. It allows users to organize their daily tasks with a pixel-art aesthetic, complete with 8-bit fonts, vibrant backgrounds, and sound effects.
+- **Technologies**: HTML, CSS, JavaScript
+- **Live Demo**: [Link to live demo](https://apricot-brigid-93.tiiny.site/)
+- **Source Code**: check Project 3
